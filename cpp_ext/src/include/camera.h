@@ -1,12 +1,13 @@
 #pragma once
 #include <opencv2/core.hpp>
+
 #include "geometry.h"
 #include "line.h"
 #include "ray.h"
 
 class Camera
 {
-public:
+  public:
     float fx, fy, f, px, py;
     cv::Point3f origin; // origin world
     cv::Matx33f intrinsic_matrix;
@@ -15,10 +16,10 @@ public:
     cv::Matx34f projection_matrix;
     cv::Matx<float, 3, 6> line_projection_matrix;
 
-private:
+  private:
     float div_fx, div_fy;
 
-public:
+  public:
     void initialize()
     {
         extrinsic_matrix_inv = extrinsic_matrix.inv();
@@ -140,5 +141,22 @@ public:
     float projectLine(const cv::Vec<float, 6> &line) const
     {
         return projectLines(PluckerLine(line), line_projection_matrix);
+    }
+
+    cv::Mat1f projectLine(const cv::Mat_<cv::Vec<float, 6>> &img_line) const
+    {
+        size_t height = img_line.rows;
+        size_t width = img_line.cols;
+        cv::Mat1f img_angle(height, width);
+
+        for (size_t y = 0; y < height; y++)
+        {
+            for (size_t x = 0; x < width; x++)
+            {
+                cv::Vec<float, 6> line = img_line(y, x);
+                img_angle(y, x) = projectLine(line);
+            }
+        }
+        return img_angle;
     }
 };

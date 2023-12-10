@@ -97,3 +97,8 @@ else()
 endif()
 
 target_link_libraries(_strandtools_impl PRIVATE OpenMP::OpenMP_CXX)
+
+# C++ apps
+add_executable(run_consistency_map app/run_consistency_map.cpp)
+add_executable(run_line_filtering app/run_line_filtering.cpp)
+add_executable(run_lpmvs app/run_lpmvs.cpp)

@@ -1,8 +1,9 @@
 #pragma once
-#include <vector>
 #include <cmath>
-#include <opencv2/core.hpp>
 #include <random.h>
+#include <vector>
+
+#include <opencv2/core.hpp>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -18,7 +19,7 @@ inline cv::Point2f sample_point_along_line(float angle, const cv::Point &center,
     return cv::Point2f(x, y);
 }
 
-std::vector<cv::Point2f> sample_point_along_line(float angle, const cv::Point &center, float radius, size_t num)
+inline std::vector<cv::Point2f> sample_point_along_line(float angle, const cv::Point &center, float radius, size_t num)
 {
     std::vector<cv::Point2f> points;
     points.reserve(num);
@@ -30,7 +31,7 @@ std::vector<cv::Point2f> sample_point_along_line(float angle, const cv::Point &c
     return points;
 }
 
-std::vector<float> sample_values(const cv::Mat1f &img, const std::vector<cv::Point2f> &points)
+inline std::vector<float> sample_values(const cv::Mat1f &img, const std::vector<cv::Point2f> &points)
 {
     int height = img.rows;
     int width = img.cols;

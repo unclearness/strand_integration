@@ -1,22 +1,29 @@
 #include <iostream>
+
 #include <nanobind/nanobind.h>
+
 #include <nanobind/ndarray.h>
-#include <nanobind/stl/vector.h>
-#include <nanobind/stl/shared_ptr.h>
+
 #include <nanobind/make_iterator.h>
+
+#include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/tuple.h>
+#include <nanobind/stl/vector.h>
+
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-#include "cv_typecaster.h"
+
+#include "../cv_typecaster.h"
+
 #include "camera.h"
 #include "dataframe.h"
+#include "line.h"
+#include "orientation.h"
+#include "pbrt.h"
 #include "propagate.h"
 #include "refinement.h"
 #include "sampler.h"
-#include "pbrt.h"
-#include "line.h"
-#include "orientation.h"
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -34,22 +41,7 @@ NB_MODULE(_strandtools_impl, m)
         .def("projectLine", [](Camera &self, const cv::Vec<float, 6> &line)
              { return self.projectLine(line); })
         .def("projectLine", [](Camera &self, const cv::Mat_<cv::Vec<float, 6>> &img_line)
-             {
-                 size_t height = img_line.rows;
-                 size_t width = img_line.cols;
-                 cv::Mat1f img_angle(height, width);
-
-                 for (size_t y = 0; y < height; y++)
-                 {
-                     for (size_t x = 0; x < width; x++)
-                     {
-                         cv::Vec<float, 6> line = img_line(y, x);
-                         img_angle(y, x) = self.projectLine(line);
-                     }
-                 }
-                 return img_angle;
-                 //
-             })
+             { return self.projectLine(img_line); })
         .def("transformPointWorld2Local", &Camera::transformPointWorld2Local)
         .def("transformPointLocal2World", &Camera::transformPointLocal2World)
         .def_ro("intrinsic_matrix", &Camera::intrinsic_matrix)

@@ -1,14 +1,16 @@
 #pragma once
-#include <vector>
-#include <memory>
 #include <limits>
+#include <memory>
+#include <vector>
+
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-#include "line.h"
-#include "geometry.h"
+
 #include "camera.h"
-#include "utils.h"
+#include "geometry.h"
+#include "line.h"
 #include "random.h"
+#include "utils.h"
 
 struct DirectionalPoint
 {
@@ -18,7 +20,7 @@ struct DirectionalPoint
 
 class SingleViewData
 {
-public:
+  public:
     // Images
     cv::Mat1f img_intensity;
     cv::Mat1f img_orientation2d;
@@ -37,7 +39,7 @@ public:
     float min_depth = 0;
     float max_depth = std::numeric_limits<float>::infinity();
 
-public:
+  public:
     cv::Size size() const
     {
         // Get size in order of (img_line, img_intensity, img_orientation2d, img_confidence, img_mask)
@@ -251,13 +253,13 @@ public:
 
 class MultiViewData : public std::vector<std::shared_ptr<SingleViewData>>
 {
-public:
+  public:
     MultiViewData(){};
 
-private:
+  private:
     std::vector<std::vector<size_t>> index_map;
 
-public:
+  public:
     void rescale(float scale)
     {
         for (auto &view : *this)

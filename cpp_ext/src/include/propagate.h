@@ -1,13 +1,18 @@
 #pragma once
 #include <memory>
 #include <vector>
+
 #include <omp.h>
+
 #include <opencv2/core.hpp>
+
+#include "costfunctions.h"
 #include "dataframe.h"
 #include "line.h"
-#include "costfunctions.h"
 
-std::vector<PluckerLine> collectLineHypotheses(const std::shared_ptr<SingleViewData> &view, const cv::Point &point)
+namespace
+{
+inline std::vector<PluckerLine> collectLineHypotheses(const std::shared_ptr<SingleViewData> &view, const cv::Point &point)
 {
     // Table of offset from target pixel position (red-black pattern)
     std::vector<cv::Point> offsets{
@@ -70,7 +75,7 @@ std::vector<PluckerLine> collectLineHypotheses(const std::shared_ptr<SingleViewD
     return line_hypotheses;
 }
 
-void propagateSub(std::shared_ptr<SingleViewData> &reference_view, const MultiViewData &neighbor_views, float radius, int num_sampling, bool update_black)
+inline void propagateSub(std::shared_ptr<SingleViewData> &reference_view, const MultiViewData &neighbor_views, float radius, int num_sampling, bool update_black)
 {
     size_t width = reference_view->width(), height = reference_view->height();
 
@@ -104,8 +109,9 @@ void propagateSub(std::shared_ptr<SingleViewData> &reference_view, const MultiVi
         }
     }
 }
+} // namespace
 
-void propagate(std::shared_ptr<SingleViewData> &reference_view, const MultiViewData &neighbor_views, float radius, int num_sampling)
+inline void propagate(std::shared_ptr<SingleViewData> &reference_view, const MultiViewData &neighbor_views, float radius, int num_sampling)
 {
     // Black
     propagateSub(reference_view, neighbor_views, radius, num_sampling, true);

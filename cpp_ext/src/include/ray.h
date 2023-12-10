@@ -3,7 +3,7 @@
 
 class Ray
 {
-public:
+  public:
     cv::Point3f origin;
     cv::Point3f direction;
 

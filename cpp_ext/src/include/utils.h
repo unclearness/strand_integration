@@ -1,16 +1,16 @@
 #pragma once
+#include <algorithm>
 #include <cmath>
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <algorithm>
-#include <numeric>
 #include <iomanip>
+#include <iostream>
+#include <numeric>
+#include <vector>
+
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "line.h"
 #include "camera.h"
+#include "line.h"
 #include "random.h"
 
 #ifndef M_PI
@@ -71,7 +71,7 @@ void print2dvector(const std::vector<std::vector<T>> &vectors)
     }
 }
 
-cv::Scalar hsv2bgr(float h, float s = 1, float v = 1)
+inline cv::Scalar hsv2bgr(float h, float s = 1, float v = 1)
 {
     assert(0.0 <= h && h <= 2 * M_PI);
     assert(0.0 <= s && s <= 1.0);
@@ -91,7 +91,7 @@ cv::Scalar hsv2bgr(float h, float s = 1, float v = 1)
     return 255.0 * cv::Scalar(blue, green, red);
 }
 
-void clamp(cv::InputArray _src, cv::OutputArray _dst, float low, float high)
+inline void clamp(cv::InputArray _src, cv::OutputArray _dst, float low, float high)
 {
     cv::Mat1f src = _src.getMat();
     CV_Assert(src.type() == CV_32FC1);
@@ -107,7 +107,7 @@ void clamp(cv::InputArray _src, cv::OutputArray _dst, float low, float high)
         });
 }
 
-void applyColorMapToAngle(cv::InputArray _img_angle, cv::OutputArray _img_color)
+inline void applyColorMapToAngle(cv::InputArray _img_angle, cv::OutputArray _img_color)
 {
     // Get image and convert radian to degree
     cv::Mat1f img_angle = _img_angle.getMat() * (179.0f / M_PI);
@@ -129,7 +129,7 @@ void applyColorMapToAngle(cv::InputArray _img_angle, cv::OutputArray _img_color)
     cv::cvtColor(img_hsv, img_color, cv::COLOR_HSV2BGR);
 }
 
-std::string zfill(const int value, const unsigned width)
+inline std::string zfill(const int value, const unsigned width)
 {
     std::ostringstream oss;
     oss << std::setw(width) << std::setfill('0') << value;

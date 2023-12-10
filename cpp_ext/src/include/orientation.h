@@ -1,11 +1,14 @@
 #pragma once
 #include <cmath>
 #include <vector>
+
 #include <omp.h>
+
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-#include "random.h"
+
 #include "costfunctions.h" // angdiff
+#include "random.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -15,7 +18,7 @@
 #define M_PI_2 1.57079632679489661923
 #endif
 
-void calcOrientation2d(
+inline void calcOrientation2d(
     cv::InputArray _img_src,
     cv::OutputArray _img_orientation2d,
     cv::OutputArray _img_confidence,

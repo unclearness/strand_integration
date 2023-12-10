@@ -1,15 +1,16 @@
 #pragma once
+#include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <filesystem>
-#include <algorithm>
 #include <regex>
 #include <vector>
-#include "utils.h"
-#include "geometry.h"
-#include "camera.h"
 
-std::string load_pbrtfile(const std::string &filename_pbrt)
+#include "camera.h"
+#include "geometry.h"
+#include "utils.h"
+
+inline std::string load_pbrtfile(const std::string &filename_pbrt)
 {
     std::filesystem::path filename_pbrt_path(filename_pbrt);
     std::filesystem::path paretnt_path = filename_pbrt_path.parent_path();
@@ -57,7 +58,7 @@ std::string load_pbrtfile(const std::string &filename_pbrt)
     return scene_pbrt;
 }
 
-std::string first_numberstring(const std::string &str, const std::size_t &pos = 0)
+inline std::string first_numberstring(const std::string &str, const std::size_t &pos = 0)
 {
     const char *digits = "-.0123456789";
     const std::size_t n = str.find_first_of(digits, pos);
@@ -69,7 +70,7 @@ std::string first_numberstring(const std::string &str, const std::size_t &pos = 
     return std::string();
 }
 
-std::vector<float> extract_numbers(const std::string &scene_pbrt, const std::string &attr_name, int n)
+inline std::vector<float> extract_numbers(const std::string &scene_pbrt, const std::string &attr_name, int n)
 {
     std::vector<float> numbers;
     numbers.reserve(n);
@@ -86,7 +87,7 @@ std::vector<float> extract_numbers(const std::string &scene_pbrt, const std::str
     return numbers;
 }
 
-void getCameraParametersFromPbrtFile(const std::string &filename_pbrt, cv::Matx33f &intrinsic_matrix, cv::Matx33f &rotation_matrix, cv::Vec3f &translation_vector)
+inline void getCameraParametersFromPbrtFile(const std::string &filename_pbrt, cv::Matx33f &intrinsic_matrix, cv::Matx33f &rotation_matrix, cv::Vec3f &translation_vector)
 {
     // Open PBRT scene file as string
     std::string scene_pbrt = load_pbrtfile(filename_pbrt);
@@ -129,7 +130,7 @@ void getCameraParametersFromPbrtFile(const std::string &filename_pbrt, cv::Matx3
     intrinsic_matrix = cv::Matx33f(f, 0, px, 0, f, py, 0, 0, 1);
 }
 
-Camera pbrtcamera(const std::string filename_pbrt)
+inline Camera pbrtcamera(const std::string filename_pbrt)
 {
     cv::Matx33f intrinsic_matrix, rotation_matrix;
     cv::Vec3f translation_vector;

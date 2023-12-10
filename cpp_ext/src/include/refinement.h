@@ -1,12 +1,15 @@
 #pragma once
 #include <memory>
-#include <omp.h>
-#include <opencv2/core.hpp>
-#include "random.h"
-#include "dataframe.h"
-#include "costfunctions.h"
 
-void refinement(std::shared_ptr<SingleViewData> &reference_view, const MultiViewData &neighbor_views, float radius, int num_sampling, float depth_perturbation = 4.f, float direction_perturbation = 0.1f)
+#include <omp.h>
+
+#include <opencv2/core.hpp>
+
+#include "costfunctions.h"
+#include "dataframe.h"
+#include "random.h"
+
+inline void refinement(std::shared_ptr<SingleViewData> &reference_view, const MultiViewData &neighbor_views, float radius, int num_sampling, float depth_perturbation = 4.f, float direction_perturbation = 0.1f)
 {
     size_t height = reference_view->height(), width = reference_view->width();
     float min_depth = reference_view->min_depth, max_depth = reference_view->max_depth;
