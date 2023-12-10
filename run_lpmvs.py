@@ -3,6 +3,16 @@ from pathlib import Path
 import time
 import numpy as np
 from tqdm import tqdm, trange
+
+import platform
+if platform.system() == 'Windows':
+    import os
+    import glob
+    for p in os.environ["Path"].split(";"):
+        dll_list = glob.glob(os.path.join(p, "opencv*.dll"))
+        if len(dll_list) > 0:
+            os.add_dll_directory(p)
+
 import strandtools
 from utils import read_multiview, write_singleview, imshow_multiview
 
@@ -23,11 +33,15 @@ def main():
     # output
     parser.add_argument("-o", "--output", type=Path)
     # others
-    parser.add_argument("--views", type=int, nargs="+", default=None, help="Specify the view indices to be processed (default: all views)")
+    parser.add_argument("--views", type=int, nargs="+", default=None,
+                        help="Specify the view indices to be processed (default: all views)")
     parser.add_argument("--imshow", action="store_true")
-    parser.add_argument("--on_memory", action="store_true", help="Read all images to memory")
-    parser.add_argument("--scale", type=float, default=1.0, help="Resize image for faster processing. Debug purpose.")
-    parser.add_argument("--save_intermediate", action="store_true", help="Save intermediate results")
+    parser.add_argument("--on_memory", action="store_true",
+                        help="Read all images to memory")
+    parser.add_argument("--scale", type=float, default=1.0,
+                        help="Resize image for faster processing. Debug purpose.")
+    parser.add_argument("--save_intermediate",
+                        action="store_true", help="Save intermediate results")
     args = parser.parse_args()
 
     print(f"Read multi-view data from {args.input}")
@@ -42,8 +56,9 @@ def main():
         # Read minimal images (defined by --num_neighbors) for each view
         # Memory efficient, but slow because of disk I/O for every iteration.
         # In the following line, only camera parameters are read.
-        multiviewdata = read_multiview(args.input, read_images=False, verbose=True)
-       
+        multiviewdata = read_multiview(
+            args.input, read_images=False, verbose=True)
+
     if args.imshow:
         print("Show multi-view data...")
         imshow_multiview(multiviewdata)
@@ -106,9 +121,12 @@ def main():
             reference_view = multiviewdata[view_i]
             neighbor_views = multiviewdata.get_neighbor(view_i, num_neighbors)
         else:
-            reference_view = read_multiview(args.input, view_select=[view_i])[0]
-            neighbor_indices = multiviewdata.get_neighbor_index_vector(pos=view_i, num=args.num_neighbors)
-            neighbor_views = read_multiview(args.input, view_select=neighbor_indices)
+            reference_view = read_multiview(
+                args.input, view_select=[view_i])[0]
+            neighbor_indices = multiviewdata.get_neighbor_index_vector(
+                pos=view_i, num=args.num_neighbors)
+            neighbor_views = read_multiview(
+                args.input, view_select=neighbor_indices)
             if args.scale != 1.0:
                 reference_view.rescale(args.scale)
                 for view in neighbor_views:
@@ -141,7 +159,8 @@ def main():
             )
 
             # Clip the depth map
-            img_depth = np.clip(reference_view.img_depth, reference_view.min_depth, reference_view.max_depth)
+            img_depth = np.clip(
+                reference_view.img_depth, reference_view.min_depth, reference_view.max_depth)
             reference_view.img_depth = img_depth
 
             # Export results
