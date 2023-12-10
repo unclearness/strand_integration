@@ -16,14 +16,7 @@
 
 #include "../cv_typecaster.h"
 
-#include "camera.h"
-#include "dataframe.h"
-#include "line.h"
-#include "orientation.h"
-#include "pbrt.h"
-#include "propagate.h"
-#include "refinement.h"
-#include "sampler.h"
+#include "strandtools.h"
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -169,11 +162,7 @@ NB_MODULE(_strandtools_impl, m)
         .def_rw("max_depth", &SingleViewData::max_depth)
         .def_rw("camera", &SingleViewData::camera);
 
-    nb::class_<std::shared_ptr<SingleViewData>>(m, "SingleViewDataPtr");
-
-    nb::class_<std::vector<std::shared_ptr<SingleViewData>>>(m, "MultiViewDataBase");
-
-    nb::class_<MultiViewData, std::vector<std::shared_ptr<SingleViewData>>>(m, "MultiViewData")
+    nb::class_<MultiViewData>(m, "MultiViewData")
         .def(nb::init<>())
         .def("resize", [](MultiViewData &self, size_t n)
              { self.resize(n); })
