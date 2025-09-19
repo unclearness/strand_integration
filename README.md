@@ -26,7 +26,27 @@ You can download the full-scale multi-view images from [release page](https://gi
 
 ## Setup
 
-Our code requires to install the our custom Python extension implemented in C++. Please build and install it before running our code.  
+We provide a [uv](https://docs.astral.sh/uv/) environment that installs the Python
+dependencies and builds the bundled `strandtools` C++ extension from source.
+
+### Using uv (recommended)
+
+```bash
+# Create the virtual environment and install dependencies
+uv sync
+
+# Activate the environment
+source .venv/bin/activate
+```
+
+The `strandtools` module is declared as a local dependency in
+[`pyproject.toml`](pyproject.toml), so `uv sync` will automatically build it from
+[`cpp_ext`](cpp_ext/).
+
+### Manual installation
+
+If you prefer to manage the environment yourself, make sure to build the C++
+extension before running the Python scripts:
 
 ```bash
 cd cpp_ext
