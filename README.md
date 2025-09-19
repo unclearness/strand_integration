@@ -43,6 +43,11 @@ The `strandtools` module is declared as a local dependency in
 [`pyproject.toml`](pyproject.toml), so `uv sync` will automatically build it from
 [`cpp_ext`](cpp_ext/).
 
+The uv configuration also pins the CUDA 11.8 wheels of PyTorch for both Ubuntu
+and Windows through the official PyTorch package index. Make sure your NVIDIA
+drivers (or the CUDA runtime) are compatible with CUDA 11.8 before syncing the
+environment.
+
 ### Manual installation
 
 If you prefer to manage the environment yourself, make sure to build the C++
@@ -51,6 +56,9 @@ extension before running the Python scripts:
 ```bash
 cd cpp_ext
 pip install .
+
+# Install the CUDA-enabled PyTorch wheels (Linux or Windows)
+pip install torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
 ```
 
 For more details, please refer to [cpp_ext](cpp_ext/).
