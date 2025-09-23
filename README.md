@@ -63,6 +63,28 @@ pip install torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu11
 
 For more details, please refer to [cpp_ext](cpp_ext/).
 
+### Windows runtime dependencies
+
+When the C++ extension is built on Windows, the resulting
+`_strandtools_impl.pyd` binary depends on the OpenCV runtime DLLs. The
+import hook in [`strandtools.__init__`](cpp_ext/src/strandtools/__init__.py)
+tries several common locations automatically (including the ones bundled with
+``opencv-python``), but you might have to point it to the directory that holds
+your OpenCV binaries when building against a custom installation.
+
+If the `strandtools` import fails with ``DLL load failed`` on Windows, export
+the location of the OpenCV DLLs before running Python:
+
+```powershell
+# PowerShell
+$env:STRANDTOOLS_EXTRA_DLL_DIRS = "C:\opencv\build\x64\vc16\bin"
+uv run python run_gabor.py
+```
+
+You can provide multiple directories by separating them with a semicolon. The
+environment variable is only needed on Windows; Linux and macOS resolve the
+OpenCV dependencies through the regular dynamic loader search path.
+
 ## Running
 
 ```bash
