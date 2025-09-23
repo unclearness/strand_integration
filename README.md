@@ -26,14 +26,70 @@ You can download the full-scale multi-view images from [release page](https://gi
 
 ## Setup
 
-Our code requires to install the our custom Python extension implemented in C++. Please build and install it before running our code.  
+We provide a [uv](https://docs.astral.sh/uv/) environment that installs the Python
+dependencies and builds the bundled `strandtools` C++ extension from source.
+
+### Using uv (recommended)
+
+```bash
+# Create the virtual environment and install dependencies
+uv sync
+
+# Activate the environment
+source .venv/bin/activate
+```
+
+The `strandtools` module is declared as a local dependency in
+[`pyproject.toml`](pyproject.toml), so `uv sync` will automatically build it from
+[`cpp_ext`](cpp_ext/).
+
+The uv configuration also pins the CUDA 11.8 wheels of PyTorch for both Ubuntu
+and Windows through the official PyTorch package index. Make sure your NVIDIA
+drivers (or the CUDA runtime) are compatible with CUDA 11.8 before syncing the
+environment.
+
+### Manual installation
+
+If you prefer to manage the environment yourself, make sure to build the C++
+extension before running the Python scripts:
 
 ```bash
 cd cpp_ext
 pip install .
+
+# Install the CUDA-enabled PyTorch wheels (Linux or Windows)
+pip install torch==2.2.2+cu118 --index-url https://download.pytorch.org/whl/cu118
 ```
 
 For more details, please refer to [cpp_ext](cpp_ext/).
+
+### Windows runtime dependencies
+
+When the C++ extension is built on Windows, the resulting
+`_strandtools_impl.pyd` binary depends on the OpenCV runtime DLLs. The
+import hook in [`strandtools.__init__`](cpp_ext/src/strandtools/__init__.py)
+tries several common locations automatically (including the ones bundled with
+``opencv-python``), but you might have to point it to the directory that holds
+your OpenCV binaries when building against a custom installation.
+
+The build process records the OpenCV version and runtime directories that were
+used to compile the extension. If the `opencv-python` package that `uv` installs
+does not match the build-time OpenCV version (for example, when you compile
+against a locally installed SDK), the loader prefers the recorded directories
+and emits a warning so that you can align the two environments if necessary.
+
+If the `strandtools` import fails with ``DLL load failed`` on Windows, export
+the location of the OpenCV DLLs before running Python:
+
+```powershell
+# PowerShell
+$env:STRANDTOOLS_EXTRA_DLL_DIRS = "C:\opencv\build\x64\vc16\bin"
+uv run python run_gabor.py
+```
+
+You can provide multiple directories by separating them with a semicolon. The
+environment variable is only needed on Windows; Linux and macOS resolve the
+OpenCV dependencies through the regular dynamic loader search path.
 
 ## Running
 
