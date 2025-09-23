@@ -97,3 +97,73 @@ else()
 endif()
 
 target_link_libraries(_strandtools_impl PRIVATE OpenMP::OpenMP_CXX)
+
+# Export build-time OpenCV configuration for the Python import shim.
+set(STRANDTOOLS_OPENCV_VERSION "${OpenCV_VERSION}")
+if(NOT STRANDTOOLS_OPENCV_VERSION)
+  set(STRANDTOOLS_OPENCV_VERSION "")
+endif()
+
+set(STRANDTOOLS_OPENCV_RUNTIME_DIRS "")
+
+if(WIN32)
+  get_target_property(_strandtools_linked_libraries _strandtools_impl LINK_LIBRARIES)
+  set(_strandtools_opencv_targets "")
+
+  foreach(_lib IN LISTS _strandtools_linked_libraries)
+    if(_lib MATCHES "^\\$<")
+      continue()
+    endif()
+
+    if(TARGET ${_lib} AND _lib MATCHES "^opencv_")
+      list(APPEND _strandtools_opencv_targets ${_lib})
+    elseif(EXISTS "${_lib}")
+      get_filename_component(_lib_dir "${_lib}" DIRECTORY)
+      list(APPEND STRANDTOOLS_OPENCV_RUNTIME_DIRS "${_lib_dir}")
+
+      get_filename_component(_lib_parent "${_lib_dir}" DIRECTORY)
+      if(_lib_parent)
+        set(_bin_hint "${_lib_parent}")
+        cmake_path(APPEND _bin_hint bin)
+        list(APPEND STRANDTOOLS_OPENCV_RUNTIME_DIRS "${_bin_hint}")
+      endif()
+    endif()
+  endforeach()
+
+  list(REMOVE_DUPLICATES _strandtools_opencv_targets)
+
+  foreach(_target IN LISTS _strandtools_opencv_targets)
+    foreach(_prop IN ITEMS IMPORTED_LOCATION_RELEASE IMPORTED_LOCATION_RELWITHDEBINFO IMPORTED_LOCATION_MINSIZEREL IMPORTED_LOCATION_DEBUG IMPORTED_LOCATION)
+      get_target_property(_opencv_location ${_target} ${_prop})
+      if(_opencv_location)
+        get_filename_component(_opencv_dir "${_opencv_location}" DIRECTORY)
+        list(APPEND STRANDTOOLS_OPENCV_RUNTIME_DIRS "${_opencv_dir}")
+      endif()
+    endforeach()
+  endforeach()
+
+  if(OpenCV_RUNTIME_LIBRARY_DIRS)
+    list(APPEND STRANDTOOLS_OPENCV_RUNTIME_DIRS ${OpenCV_RUNTIME_LIBRARY_DIRS})
+  endif()
+
+  if(OpenCV_BIN_DIR)
+    list(APPEND STRANDTOOLS_OPENCV_RUNTIME_DIRS "${OpenCV_BIN_DIR}")
+  endif()
+
+  list(REMOVE_DUPLICATES STRANDTOOLS_OPENCV_RUNTIME_DIRS)
+endif()
+
+set(STRANDTOOLS_OPENCV_RUNTIME_DIRS_PY "")
+foreach(_dir IN LISTS STRANDTOOLS_OPENCV_RUNTIME_DIRS)
+  file(TO_CMAKE_PATH "${_dir}" _dir_norm)
+  string(APPEND STRANDTOOLS_OPENCV_RUNTIME_DIRS_PY "    r\"${_dir_norm}\",\n")
+endforeach()
+
+set(_strandtools_opencv_config "${CMAKE_CURRENT_BINARY_DIR}/generated/_opencv_config.py")
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/strandtools/_opencv_config.in.py
+  ${_strandtools_opencv_config}
+  @ONLY
+)
+
+install(FILES ${_strandtools_opencv_config} DESTINATION strandtools)

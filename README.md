@@ -72,6 +72,12 @@ tries several common locations automatically (including the ones bundled with
 ``opencv-python``), but you might have to point it to the directory that holds
 your OpenCV binaries when building against a custom installation.
 
+The build process records the OpenCV version and runtime directories that were
+used to compile the extension. If the `opencv-python` package that `uv` installs
+does not match the build-time OpenCV version (for example, when you compile
+against a locally installed SDK), the loader prefers the recorded directories
+and emits a warning so that you can align the two environments if necessary.
+
 If the `strandtools` import fails with ``DLL load failed`` on Windows, export
 the location of the OpenCV DLLs before running Python:
 
